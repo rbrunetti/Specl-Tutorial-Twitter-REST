@@ -12,8 +12,10 @@ Show one of the possible use of [WSCoL](http://samguinea.github.io/wscol): retri
 3. [Code](#code)
     - [Authentication Process](#authentication-process)
     - [Fetch Data](#fetch-data)
-        + asd
-        + asd
+        + [GET statuses/user_timeline](#user_timeline)
+        + [GET search/tweets](#search_tweets)
+        + [GET trends/place](#trend_place)
+        + [GET application/rate_limit_status](#rate_limit_status)
     - [Requests and Responses](#requests-and-responses)
     - [Whole Code](#whole-code)
 4. [Project Structure](#project-structure)
@@ -44,24 +46,24 @@ Required:
 Save libraries in a folder inside your project (we called it _lib_).<br/>
 Then, from Eclipse, select the libraries, right click on them and select _Add to build path_ from the _Build path..._ voice.
 
-![Add Libraries](https://github.com/rbrunetti/rbrunetti.github.io/blob/master/tutorial-images/twitter/00-ImportLibs.png)
+![Add Libraries](https://raw.github.com/rbrunetti/rbrunetti.github.io/master/tutorial-images/twitter/00-ImportLibs.png)
 
 # Twitter Application Registration
 Now we need to register a new application, for granting the rights to use APIs. Note that a Twitter account is mandatory for proceed.<br/>
 
-![Twitter Dev](https://github.com/rbrunetti/rbrunetti.github.io/blob/master/tutorial-images/twitter/01-DevTwitter.png)
+![Twitter Dev](https://raw.github.com/rbrunetti/rbrunetti.github.io/master/tutorial-images/twitter/01-DevTwitter.png)
 
 Go to [https://dev.twitter.com](https://dev.twitter.com), sign up with your account and then select from the dropdown menu _My Application_.
 
-![New Application](https://github.com/rbrunetti/rbrunetti.github.io/blob/master/tutorial-images/twitter/02-NewApp.png)
+![New Application](https://raw.github.com/rbrunetti/rbrunetti.github.io/master/tutorial-images/twitter/02-NewApp.png)
 
 At this point, create a new application, filling all the required fields and go on.
 
-![Application's Fields](https://github.com/rbrunetti/rbrunetti.github.io/blob/master/tutorial-images/twitter/03-AppInfo.png)
+![Application's Fields](https://raw.github.com/rbrunetti/rbrunetti.github.io/master/tutorial-images/twitter/03-AppInfo.png)
 
 At the end of the day you'll have access to your application and its settings, in particular to the __Consumer Key__ and __Consumer Secret__ (remember that the latter must not be shared), that we'll use sooner.
 
-![Application's Details](https://github.com/rbrunetti/rbrunetti.github.io/blob/master/tutorial-images/twitter/04-AppData.png)
+![Application's Details](https://raw.github.com/rbrunetti/rbrunetti.github.io/master/tutorial-images/twitter/04-AppData.png)
 
 # Code
 In this section we illustrate the portions of code.
@@ -706,8 +708,7 @@ public class TestTwitter {
 
 # Project Structure
 The structure of the Java project
-
-![Project Structure](https://github.com/rbrunetti/rbrunetti.github.io/blob/master/tutorial-images/twitter/05-ProjStruct.png)
+![Project Structure](https://raw.github.com/rbrunetti/rbrunetti.github.io/master/tutorial-images/twitter/05-ProjStruct.png)
 
 # Conclusions
 WSCoL is a powerful and flexible language, that could be used also for extracting data from JSON in a simpler and clearer way than usual.
