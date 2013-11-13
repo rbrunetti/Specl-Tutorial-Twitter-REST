@@ -188,60 +188,51 @@ public class TestTwitter {
 	}
 	
 	// Fetches the status of the api limits
-		private static Map<String, Object> fetchRateLimitStatus() throws IOException {
-			HttpsURLConnection connection = null;
+	// see https://dev.twitter.com/docs/api/1.1/get/application/rate_limit_status
+	private static Map<String, Object> fetchRateLimitStatus() throws IOException {
+		HttpsURLConnection connection = null;
 
-			String endPointUrl = "https://api.twitter.com/1.1/application/rate_limit_status.json?resources=search,statuses,trends";
-			
-			try {
-				URL url = new URL(endPointUrl);
-				connection = (HttpsURLConnection) url.openConnection();
-				connection.setDoOutput(true);
-				connection.setDoInput(true);
-				connection.setRequestMethod("GET");
-				connection.setRequestProperty("Host", "api.twitter.com");
-				connection.setRequestProperty("User-Agent", "Your Program Name");
-				connection.setRequestProperty("Authorization", "Bearer " + bearerToken);
-				connection.setUseCaches(false);
+		String endPointUrl = "https://api.twitter.com/1.1/application/rate_limit_status.json?resources=search,statuses,trends";
 
-				// Parse the JSON response into a JSON mapped object to fetch fields from.
-				String response = readResponse(connection);
-				String assertion = ""
-						+ "let $status_remain = /resources/statuses/statusesuser_timeline/remaining;"
-						+ "let $status_limit = /resources/statuses/statusesuser_timeline/limit;"
-						+ "let $status_available = $status_remain / $status_limit * 100;"
-						+ "let $search_remain = /resources/search/searchtweets/remaining;"
-						+ "let $search_limit = /resources/search/searchtweets/limit;"
-						+ "let $search_available = $search_remain / $search_limit * 100;"
-						+ "let $trends_place_remain = /resources/trends/trendsplace/remaining;"
-						+ "let $trends_place_limit = /resources/trends/trendsplace/limit;"
-						+ "let $trends_place_available = $trends_place_remain / $trends_place_limit * 100;"
-						+ " !($status_available <= 0 || $search_available <= 0 || $trends_place_available <= 0);";
-				
-				Object statusPercentage = null;
-				Object searchPercentage = null;
-				Object trendsPercentage = null;
-				if(evaluateWscol(response, assertion)) {
-					statusPercentage = analyzer.getVariable("$status_available");
-					searchPercentage = analyzer.getVariable("$search_available");
-					trendsPercentage = analyzer.getVariable("$trends_place_available");
-				}
-				if(statusPercentage != null && searchPercentage != null && trendsPercentage != null) {
-					Map<String, Object> result = new HashMap<>();
-					result.put("statusPercentage", statusPercentage);
-					result.put("searchPercentage", searchPercentage);
-					result.put("trendsPercentage", trendsPercentage);
-					return result;
-				}
-				return null;
-			} catch (MalformedURLException e) {
-				throw new IOException("Invalid endpoint URL specified.", e);
-			} finally {
-				if (connection != null) {
-					connection.disconnect();
-				}
+		try {
+			URL url = new URL(endPointUrl);
+			connection = (HttpsURLConnection) url.openConnection();
+			connection.setDoOutput(true);
+			connection.setDoInput(true);
+			connection.setRequestMethod("GET");
+			connection.setRequestProperty("Host", "api.twitter.com");
+			connection.setRequestProperty("User-Agent", "Your Program Name");
+			connection.setRequestProperty("Authorization", "Bearer " + bearerToken);
+			connection.setUseCaches(false);
+
+			// Parse the JSON response into a JSON mapped object to fetch fields from.
+			String response = readResponse(connection);
+			String assertion = "" + "let $status_remain = /resources/statuses/statusesuser_timeline/remaining;" + "let $status_limit = /resources/statuses/statusesuser_timeline/limit;" + "let $status_available = $status_remain / $status_limit * 100;" + "let $search_remain = /resources/search/searchtweets/remaining;" + "let $search_limit = /resources/search/searchtweets/limit;" + "let $search_available = $search_remain / $search_limit * 100;" + "let $trends_place_remain = /resources/trends/trendsplace/remaining;" + "let $trends_place_limit = /resources/trends/trendsplace/limit;" + "let $trends_place_available = $trends_place_remain / $trends_place_limit * 100;" + " !($status_available <= 0 || $search_available <= 0 || $trends_place_available <= 0);";
+
+			Object statusPercentage = null;
+			Object searchPercentage = null;
+			Object trendsPercentage = null;
+			if (evaluateWscol(response, assertion)) {
+				statusPercentage = analyzer.getVariable("$status_available");
+				searchPercentage = analyzer.getVariable("$search_available");
+				trendsPercentage = analyzer.getVariable("$trends_place_available");
+			}
+			if (statusPercentage != null && searchPercentage != null && trendsPercentage != null) {
+				Map<String, Object> result = new HashMap<>();
+				result.put("statusPercentage", statusPercentage);
+				result.put("searchPercentage", searchPercentage);
+				result.put("trendsPercentage", trendsPercentage);
+				return result;
+			}
+			return null;
+		} catch (MalformedURLException e) {
+			throw new IOException("Invalid endpoint URL specified.", e);
+		} finally {
+			if (connection != null) {
+				connection.disconnect();
 			}
 		}
+	}
 
 	// Constructs the request for requesting a bearer token and returns that token as a string
 	private static String requestBearerToken(String endPointUrl) throws IOException {
