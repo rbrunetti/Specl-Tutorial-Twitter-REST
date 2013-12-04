@@ -1,7 +1,7 @@
-WSCoL-Tutorial-Twitter-REST
+Specl-Tutorial-Twitter-REST
 ===========================
 
-Show one of the possible use of [WSCoL](http://samguinea.github.io/wscol): retrieving data from the JSON obtained via Twitter's REST API v1.1.
+Show one of the possible use of [Specl](http://samguinea.github.io/Specl): retrieving data from the JSON obtained via Twitter's REST API v1.1.
 
 ## Table of Content
 0. [Intro](#intro)
@@ -22,7 +22,7 @@ Show one of the possible use of [WSCoL](http://samguinea.github.io/wscol): retri
 5. [Conclusions](#conclusions)
 
 # Intro
-This tutorial is part of the example use cases of the [WSCoL](http://samguinea.github.io/wscol) language: an assertion constraint language extremely flexible.<br/>
+This tutorial is part of the example use cases of the [Specl](http://samguinea.github.io/Specl) language: an assertion constraint language extremely flexible.<br/>
 Here we use it's capability for extract informations obtained via Twitter's REST APIs version 1.1, so from JSON response messages.<br/>
 The example is based on an [application-only authentication](https://dev.twitter.com/docs/auth/application-only-auth) which doesn't need a program to login as a specific user. In this way, the set of accessible informations are the ones that are public (publicly accessible tweets, lists or user information), in a read-only manner (for example is useful for widgets and similar).<br/>
 For this demo it's enough, but if interested in a deeper use of Twitter take a look at [     OAuth signed requests](https://dev.twitter.com/docs/auth/obtaining-access-tokens).
@@ -37,8 +37,8 @@ We're going to use [Eclipse IDE](http://eclipse.org/).
 
 Required:
 
-* WSCoL-Analyzer
-* WSCoL
+* Specl-Analyzer
+* Specl
 * [json-simple-1.1](https://code.google.com/p/json-simple/)
 * [Apache Commonds Codec](http://commons.apache.org/proper/commons-codec/download_codec.cgi)
 
@@ -113,12 +113,12 @@ private static String requestBearerToken(String endPointUrl) throws IOException 
 		connection.setUseCaches(false);
 
         writeRequest(connection, "grant_type=client_credentials");
-		// we use WSCoL Analyzer for extract data from something like "{"access_token":"AAAAAAAAAAAAAAAAAAAAAGXPUQAAAAA...","token_type":"bearer"}"
+		// we use Specl Analyzer for extract data from something like "{"access_token":"AAAAAAAAAAAAAAAAAAAAAGXPUQAAAAA...","token_type":"bearer"}"
 		String response = readResponse(connection);
 		String assertion = "let $token = /access_token;\n $token.cardinality() != 0 && /token_type == \"bearer\";";
 		Object token = null;
-		if(evaluateWscol(response, assertion)) {
-            // getVariable(str) returns the value corresponding to the passed variable name, the same as the one declared in WSCoL
+		if(evaluateSpecl(response, assertion)) {
+            // getVariable(str) returns the value corresponding to the passed variable name, the same as the one declared in Specl
 			token = analyzer.getVariable("$token");
 		}
 		return (token != null) ? (String) token : new String();
@@ -132,7 +132,7 @@ private static String requestBearerToken(String endPointUrl) throws IOException 
 	}
 }
 ```
-Note that we've used WSCoL and WSCoL analyzer for handle the JSON and subsequently recall a WSCoL variable, using the `getVariable` method.
+Note that we've used Specl and Specl analyzer for handle the JSON and subsequently recall a Specl variable, using the `getVariable` method.
 
 ## Fetch Data
 
@@ -168,7 +168,7 @@ private static Object fetchTimelineTweet(String screen_name, int count) throws I
 		String response = readResponse(connection);
 		String assertion = "let $tweets = /root[text != \"\"]/text; /root.cardinality() > 0;";
     	Object texts = null;
-		if(evaluateWscol(response, assertion)) {
+		if(evaluateSpecl(response, assertion)) {
 			texts = analyzer.getVariable("$tweets");
 		}
 		return (texts != null) ? texts : new String();
@@ -182,9 +182,9 @@ private static Object fetchTimelineTweet(String screen_name, int count) throws I
 }
 ```
 With the method `readResponse` we obtain the string containing the response to the previously request, sent through the connection and with the earned _bearer token_.<br/>
-Then we write the WSCoL assertion we want to check: we get the text of all the tweets that has non-empty text and store them in `$tweets`, verifing that the response has at least one object (`/root.cardinality() > 0`).<br/>
-Looking more closely at the assertions we can see that there is the step `/root`: this is introduced because the value reported by `response` is a JSON array, in this cases WSCoL assign that array to a generic key, precisely `root`, leading to the a default SDO (substantially a map admitting nesting).<br/>
-If the evaluation of the WSCoL gives positive result, the value corresponding to variable `$tweets` will be assigned to `texts` (this call gives back an object of type Array).
+Then we write the Specl assertion we want to check: we get the text of all the tweets that has non-empty text and store them in `$tweets`, verifing that the response has at least one object (`/root.cardinality() > 0`).<br/>
+Looking more closely at the assertions we can see that there is the step `/root`: this is introduced because the value reported by `response` is a JSON array, in this cases Specl assign that array to a generic key, precisely `root`, leading to the a default SDO (substantially a map admitting nesting).<br/>
+If the evaluation of the Specl gives positive result, the value corresponding to variable `$tweets` will be assigned to `texts` (this call gives back an object of type Array).
 
 <a name="search_tweets"></a>
 ### GET search/tweets
@@ -214,7 +214,7 @@ private static Object fetchSearchedTweet(String query, int count) throws IOExcep
         String response = readResponse(connection);
 		String assertion = "let $italian_user = /statuses[lang==\"it\"]/user/screen_name; /statuses.cardinality() > 0;";
 		Object itu = null;
-		if(evaluateWscol(response, assertion)){
+		if(evaluateSpecl(response, assertion)){
 			itu = analyzer.getVariable("$italian_user");
     	}
 		return (itu != null) ? itu : new String();
@@ -227,15 +227,15 @@ private static Object fetchSearchedTweet(String query, int count) throws IOExcep
 	}
 }
 ```
-The flow is as in the previous case: get the response, fetch data with WSCoL and use them.<br/>
-WSCoL selects the statuses where the language is italian (`/statuses[lang==\"it\"`), then, for each status, gets the <i>screen_name</i> of its user. The result is an array with the list of user's names.<br/>
+The flow is as in the previous case: get the response, fetch data with Specl and use them.<br/>
+Specl selects the statuses where the language is italian (`/statuses[lang==\"it\"]`), then, for each status, gets the <i>screen_name</i> of its user. The result is an array with the list of user's names.<br/>
 The variable we extract is `$italian_user`.
 
 <a name="trend_place"></a>
 ### GET trends/place
 &laquo;Returns the top 10 trending topics for a specific WOEID, if trending information is available for it.&raquo;<br/>
 (WOEID is the [Yahoo! Where On Earth ID](http://developer.yahoo.com/geo/geoplanet/) of the location to return trending information for).<br/>
-In the next snippet we obtain the trending topics for a passed WOEID, the program is expecting the ones for Milan (see the WSCoL string).
+In the next snippet we obtain the trending topics for a passed WOEID, the program is expecting the ones for Milan (see the Specl string).
 ```Java
 // Fetches the top 10 trends from a given city's WOEID
 // see https://dev.twitter.com/docs/api/1.1/get/trends/place
@@ -261,7 +261,7 @@ private static Object fetchTrendsByWOEID(String woeid) throws IOException {
 			    + "exists($elem in $trends, $elem.startsWith(\"#\")) && /root/locations/name == \"Milan\";";
 
 		Object trends = null;
-		if(evaluateWscol(response, assertion)) {
+		if(evaluateSpecl(response, assertion)) {
 			trends = analyzer.getVariable("$trends");
 		}
 		return (trends != null) ? trends : new String();
@@ -318,7 +318,7 @@ private static Map<String, Object> fetchRateLimitStatus() throws IOException {
 		Object statusPercentage = null;
 		Object searchPercentage = null;
 		Object trendsPercentage = null;
-		if (evaluateWscol(response, assertion)) {
+		if (evaluateSpecl(response, assertion)) {
 			statusPercentage = analyzer.getVariable("$status_available");
 	    	searchPercentage = analyzer.getVariable("$search_available");
 			trendsPercentage = analyzer.getVariable("$trends_place_available");
@@ -340,10 +340,10 @@ private static Map<String, Object> fetchRateLimitStatus() throws IOException {
 	}
 }
 ```
-In this final case, we use the WSCoL for making simple arithmetic expression for calculating the percentage of use of each resourse, after getting the data from the JSON.<br/>
+In this final case, we use the Specl for making simple arithmetic expression for calculating the percentage of use of each resourse, after getting the data from the JSON.<br/>
 For details on resource family and requests limits see [here](https://dev.twitter.com/docs/rate-limiting/1.1/limits).<br/>
 With the initial declaration limits, remaining requests and percertage are calculated; then the assertions checks that none of each limit has been excedeed (`!($status_available <= 0 || $search_available <= 0 || $trends_place_available <= 0)`).<br/>
-There's another little thing: the JSON returned by Twitter has some keys with non-alphanumeric characters (for example the `/` in `/statuses/user_timeline`, also conflicting with the navigation steps), in this situation WSCoL strips away unallowed characters and replace them with a '-' in case of white space (`/statuses/user_timeline` as become `statusesuser_timeline`). Keep this in mind when making assertions.
+There's another little thing: the JSON returned by Twitter has some keys with non-alphanumeric characters (for example the `/` in `/statuses/user_timeline`, also conflicting with the navigation steps), in this situation Specl strips away unallowed characters and replace them with a '-' in case of white space (`/statuses/user_timeline` as become `statusesuser_timeline`). Keep this in mind when making assertions.
 
 ## Requests and Responses
 The last methods are helper functions for input and output streams:
@@ -381,11 +381,11 @@ private static String readResponse(HttpsURLConnection connection) {
 
 ## Whole Code
 ```Java
-package it.polimi.wscol.twitter;
+package it.polimi.specl.twitter;
 
-import it.polimi.wscol.WSCoLAnalyzer;
-import it.polimi.wscol.dataobject.DataObject;
-import it.polimi.wscol.helpers.WSCoLException;
+import it.polimi.specl.SpeclAnalyzer;
+import it.polimi.specl.dataobject.DataObject;
+import it.polimi.specl.helpers.SpeclException;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -410,7 +410,7 @@ public class TestTwitter {
     private static final String consumerKey = "<your consumerKey>";
 	private static final String consumerSecret = "<your consumerSecret>";
 	private static String bearerToken;
-	private static WSCoLAnalyzer analyzer;
+	private static SpeclAnalyzer analyzer;
 
 	@SuppressWarnings("unchecked")
 	public static void main(String[] args) {
@@ -474,7 +474,7 @@ public class TestTwitter {
 			String assertion = "let $tweets = /root[text != \"\"]/text; /root.cardinality() > 0;";
 			
 			Object texts = null;
-			if(evaluateWscol(response, assertion)) {
+			if(evaluateSpecl(response, assertion)) {
 				texts = analyzer.getVariable("$tweets");
 			}
 			return (texts != null) ? texts : new String();
@@ -510,7 +510,7 @@ public class TestTwitter {
 			String assertion = "let $italian_user = /statuses[lang==\"it\"]/user/screen_name; /statuses.cardinality() > 0;";
 
 			Object itu = null;
-			if(evaluateWscol(response, assertion)){
+			if(evaluateSpecl(response, assertion)){
 				itu = analyzer.getVariable("$italian_user");
 			}
 			return (itu != null) ? itu : new String();
@@ -547,7 +547,7 @@ public class TestTwitter {
 					+ "exists($elem in $trends, $elem.startsWith(\"#\")) && /root/locations/name == \"Milan\";";
 
 			Object trends = null;
-			if(evaluateWscol(response, assertion)) {
+			if(evaluateSpecl(response, assertion)) {
 				trends = analyzer.getVariable("$trends");
 			}
 			return (trends != null) ? trends : new String();
@@ -585,7 +585,7 @@ public class TestTwitter {
 			Object statusPercentage = null;
 			Object searchPercentage = null;
 			Object trendsPercentage = null;
-			if (evaluateWscol(response, assertion)) {
+			if (evaluateSpecl(response, assertion)) {
 				statusPercentage = analyzer.getVariable("$status_available");
 				searchPercentage = analyzer.getVariable("$search_available");
 				trendsPercentage = analyzer.getVariable("$trends_place_available");
@@ -631,7 +631,7 @@ public class TestTwitter {
 			String response = readResponse(connection);
 			String assertion = "let $token = /access_token;\n $token.cardinality() != 0 && /token_type == \"bearer\";";
 			Object token = null;
-			if(evaluateWscol(response, assertion)) {
+			if(evaluateSpecl(response, assertion)) {
 				token = analyzer.getVariable("$token");
 			}
 			return (token != null) ? (String) token : new String();
@@ -689,14 +689,14 @@ public class TestTwitter {
 		}
 	}
 
-	private static boolean evaluateWscol(String jsonInput, String wscol) {
-		analyzer = new WSCoLAnalyzer();
+	private static boolean evaluateSpecl(String jsonInput, String specl) {
+		analyzer = new SpeclAnalyzer();
 		analyzer.setJSONInput(jsonInput);
-		DataObject a = WSCoLAnalyzer.getInput();
+		DataObject a = SpeclAnalyzer.getInput();
 		a.getClass();
 		try {
-			return analyzer.evaluate(wscol);
-		} catch (WSCoLException e) {
+			return analyzer.evaluate(specl);
+		} catch (SpeclException e) {
 			// e.printStackTrace();
 			return false;
 		}
@@ -707,8 +707,8 @@ public class TestTwitter {
 ```
 
 # Project Structure
-The structure of the Java project
+The structure of the Java project<br/>
 ![Project Structure](https://raw.github.com/rbrunetti/rbrunetti.github.io/master/tutorial-images/twitter/05-ProjStruct.png)
 
 # Conclusions
-WSCoL is a powerful and flexible language, that could be used also for extracting data from JSON in a simpler and clearer way than usual.
+Specl is a powerful and flexible language, that could be used also for extracting data from JSON in a simpler and clearer way than usual.
